@@ -12,7 +12,7 @@ const ScrambleText = ({ text }) => {
     const maxIterations = 5;
     const interval = setInterval(() => {
       setDisplayText(text.split('').map((char, index) => {
-        if(char === ' ') return ' ';
+        if (char === ' ') return ' ';
         return chars[Math.floor(Math.random() * chars.length)];
       }).join(''));
       
@@ -25,7 +25,7 @@ const ScrambleText = ({ text }) => {
   };
 
   return (
-    <span onMouseEnter={handleMouseEnter} className="relative z-10">
+    <span onMouseEnter={handleMouseEnter} className="relative z-10 font-display font-black tracking-tight">
       {displayText}
     </span>
   );
@@ -42,13 +42,13 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > 100) {
+      if (currentScrollY > 80) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
 
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100 && !menuOpen) {
+      if (currentScrollY > lastScrollY.current && currentScrollY > 120 && !menuOpen) {
         setHidden(true);
       } else {
         setHidden(false);
@@ -71,7 +71,6 @@ const Navbar = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial check
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [menuOpen]);
@@ -83,20 +82,25 @@ const Navbar = () => {
         animate={{ 
           y: hidden ? '-100%' : '0%',
         }}
-        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/60 backdrop-blur-2xl border-b border-white/5 py-2' : 'bg-transparent py-6'}`}
+        transition={{ type: 'spring', stiffness: 220, damping: 26 }}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-black/70 backdrop-blur-2xl border-b border-white/10 py-3'
+            : 'bg-transparent py-6'
+        }`}
       >
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <a
-            href="/"
+            href="#hero"
             onMouseEnter={() => setCursorVariant('hover')}
             onMouseLeave={() => setCursorVariant('default')}
-            className="text-2xl font-bold text-white tracking-tighter z-50 relative"
+            className="text-xl sm:text-2xl font-display font-black text-white tracking-tight z-50 relative flex items-center gap-2"
           >
-            <ScrambleText text="YN." />
+            <ScrambleText text="PREMAL." />
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse inline-block" />
           </a>
 
-          <div className="hidden md:flex items-center space-x-2 relative bg-white/5 rounded-full px-2 py-1 border border-white/10 backdrop-blur-md">
+          <div className="hidden md:flex items-center space-x-1 relative bg-white/[0.04] rounded-full px-2 py-1.5 border border-white/10 backdrop-blur-xl">
             {NAV_LINKS?.map((link, i) => {
               const isActive = activeSection === link.href.replace('#', '');
               return (
@@ -105,16 +109,18 @@ const Navbar = () => {
                   href={link.href}
                   onMouseEnter={() => setCursorVariant('hover')}
                   onMouseLeave={() => setCursorVariant('default')}
-                  className="relative px-4 py-2"
+                  className="relative px-4 py-1.5 rounded-full transition-colors"
                 >
                   {isActive && (
                     <motion.div
                       layoutId="nav-pill"
-                      className="absolute inset-0 bg-white/10 rounded-full"
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      className="absolute inset-0 bg-white/15 rounded-full"
+                      transition={{ type: "spring", stiffness: 350, damping: 32 }}
                     />
                   )}
-                  <span className={`relative z-10 text-xs font-medium uppercase tracking-widest transition-colors ${isActive ? 'text-white' : 'text-white/60 hover:text-white'}`}>
+                  <span className={`relative z-10 text-[11px] font-mono uppercase tracking-widest transition-colors ${
+                    isActive ? 'text-white font-bold' : 'text-white/60 hover:text-white'
+                  }`}>
                     {link.name}
                   </span>
                 </a>
@@ -131,15 +137,15 @@ const Navbar = () => {
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 flex flex-col items-end gap-1.5">
               <motion.span 
                 animate={menuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }} 
-                className="w-full h-[1px] bg-white block transition-transform origin-center" 
+                className="w-full h-[1.5px] bg-white block transition-transform origin-center" 
               />
               <motion.span 
                 animate={menuOpen ? { opacity: 0 } : { opacity: 1 }} 
-                className="w-4 h-[1px] bg-white block transition-opacity" 
+                className="w-4 h-[1.5px] bg-white block transition-opacity" 
               />
               <motion.span 
                 animate={menuOpen ? { rotate: -45, y: -8, width: '100%' } : { rotate: 0, y: 0, width: '75%' }} 
-                className="w-full h-[1px] bg-white block transition-transform origin-center" 
+                className="w-full h-[1.5px] bg-white block transition-transform origin-center" 
               />
             </div>
           </button>
@@ -153,7 +159,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center"
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center"
           >
             <div className="flex flex-col items-center gap-8 perspective-[1000px]">
               {NAV_LINKS?.map((link, i) => (
@@ -164,8 +170,8 @@ const Navbar = () => {
                     initial={{ y: '100%', rotateX: -90, opacity: 0 }}
                     animate={{ y: '0%', rotateX: 0, opacity: 1 }}
                     exit={{ y: '-100%', rotateX: 90, opacity: 0 }}
-                    transition={{ delay: i * 0.1, duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
-                    className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter block transform-origin-bottom"
+                    transition={{ delay: i * 0.08, duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+                    className="text-4xl sm:text-5xl font-display font-black text-white uppercase tracking-tight block transform-origin-bottom hover:text-accent transition-colors"
                   >
                     {link.name}
                   </motion.a>

@@ -1,13 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import InteractiveTerminal from '../ui/InteractiveTerminal';
+import TextReveal from '../ui/TextReveal';
 import ParallaxText from '../ui/ParallaxText';
-import SplitTextHover from '../ui/SplitTextHover';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const StatItem = ({ number, label, suffix = '', subtext = '' }) => {
+const Stat = ({ number, label, suffix = '' }) => {
   const numberRef = useRef(null);
 
   useEffect(() => {
@@ -34,23 +33,17 @@ const StatItem = ({ number, label, suffix = '', subtext = '' }) => {
   }, [number, suffix]);
 
   return (
-    <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md flex flex-col justify-between group hover:border-accent/40 transition-colors duration-500">
-      <div className="flex items-baseline justify-between mb-4">
-        <span ref={numberRef} className="text-4xl md:text-5xl font-black text-white tracking-tight">
-          0{suffix}
-        </span>
-        <span className="w-2 h-2 rounded-full bg-accent/60 group-hover:scale-150 transition-transform duration-300" />
-      </div>
-      <div>
-        <h4 className="text-sm font-bold text-white/90 uppercase tracking-wider">{label}</h4>
-        {subtext && <p className="text-xs text-white/40 mt-1 font-mono">{subtext}</p>}
-      </div>
+    <div className="flex flex-col gap-2">
+      <span ref={numberRef} className="text-5xl sm:text-6xl md:text-7xl font-display font-black text-white tracking-tight">
+        0{suffix}
+      </span>
+      <span className="text-white/40 text-xs sm:text-sm font-mono uppercase tracking-widest">{label}</span>
     </div>
   );
 };
 
 const About = () => {
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
   const headerRef = useRef(null);
 
   useEffect(() => {
@@ -69,118 +62,74 @@ const About = () => {
           },
         }
       );
-    }, containerRef);
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
     <>
-      <section id="about" ref={containerRef} className="relative min-h-screen py-32 px-6 md:px-14 lg:px-20">
-        {/* Section Header */}
-        <div ref={headerRef} className="max-w-4xl mb-20">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="w-6 h-[1px] bg-accent" />
-            <span className="text-accent text-xs font-mono uppercase tracking-[0.3em] font-semibold">
-              ✦ 01 // ARCHITECTURAL DOSSIER
+      <section id="about" ref={sectionRef} className="relative min-h-screen py-36 px-6 md:px-14 lg:px-20 bg-black">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div ref={headerRef} className="mb-20">
+            <span className="text-accent uppercase tracking-[0.3em] text-xs font-mono font-semibold mb-4 block">
+              ✦ 01 // ABOUT ME
             </span>
+            <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-black text-white tracking-tight leading-[1.05]">
+              Engineering things <br />
+              <span className="gradient-text">for the modern web.</span>
+            </h2>
           </div>
 
-          <SplitTextHover
-            text="ENGINEERING & CRAFT"
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter block"
-            repelRadius={90}
-            repelStrength={18}
-          />
-
-          <p className="text-white/40 text-lg md:text-xl font-light mt-6 leading-relaxed max-w-2xl">
-            Bridging raw computational performance with bespoke creative motion. Every interaction is
-            engineered with sub-millisecond precision.
-          </p>
-        </div>
-
-        {/* BENTO GRID 2.0 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto">
-          {/* Bento Cell 1: Interactive Cyber Terminal (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col">
-            <InteractiveTerminal />
+          {/* Word-by-Word Scroll Reveal Statement */}
+          <div className="mb-24 max-w-4xl">
+            <TextReveal
+              text="I am a Full Stack Developer & Creative Technologist specializing in building exceptional, ultra-responsive digital products. I combine computational engineering with cinematic 3D motion to turn complex challenges into seamless, unforgettable web experiences."
+              className="text-2xl sm:text-3xl md:text-4xl font-light text-white leading-relaxed"
+            />
           </div>
 
-          {/* Bento Cell 2: Global Telemetry & Radar Beacon (5 cols) */}
-          <div className="lg:col-span-5 p-7 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors duration-500">
-            {/* Background Radar Rings */}
-            <div className="absolute -right-16 -top-16 w-64 h-64 border border-accent/15 rounded-full pointer-events-none group-hover:border-accent/30 transition-colors" />
-            <div className="absolute -right-16 -top-16 w-48 h-48 border border-white/5 rounded-full pointer-events-none" />
-            <div className="absolute -right-16 -top-16 w-32 h-32 border border-accent/20 rounded-full pointer-events-none" />
+          {/* Stats Quad */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-14 border-y border-white/10 mb-24">
+            <Stat number={5} suffix="+" label="Years Experience" />
+            <Stat number={48} suffix="+" label="Products Shipped" />
+            <Stat number={100} suffix="+" label="Shader & Motion Tests" />
+            <Stat number={60} suffix=" FPS" label="Performance Standard" />
+          </div>
 
-            <div>
-              <div className="flex items-center justify-between text-[11px] font-mono text-white/40 tracking-widest uppercase mb-8">
-                <span>BEACON // TELEMETRY</span>
-                <span className="flex items-center gap-2 text-emerald-400">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                  AVAILABLE
-                </span>
-              </div>
-
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                Global Operations
-              </h3>
-              <p className="text-sm text-white/50 leading-relaxed font-light mb-6">
-                Operating remotely across global timezones. Ready to deploy specialized architecture for world-class
-                teams and ambitious design systems.
+          {/* 3 Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl">
+              <span className="text-accent text-xs font-mono tracking-widest block mb-4">01 // CREATIVE MOTION</span>
+              <h3 className="text-2xl font-bold text-white mb-3">Fluid Physics</h3>
+              <p className="text-white/50 text-sm leading-relaxed font-light">
+                Choreographing silky smooth transitions, spring physics, and natural kinetic feedback with GSAP and Framer Motion.
               </p>
             </div>
 
-            {/* Radar Coordinates Box */}
-            <div className="p-4 rounded-xl bg-black/40 border border-white/10 font-mono text-xs space-y-2">
-              <div className="flex justify-between text-white/60">
-                <span>BASE COORD:</span>
-                <span className="text-accent font-bold">28.6139° N, 77.2090° E</span>
-              </div>
-              <div className="flex justify-between text-white/60">
-                <span>DEPLOY STATUS:</span>
-                <span className="text-emerald-400">READY_FOR_COMMISSION</span>
-              </div>
-              <div className="flex justify-between text-white/60">
-                <span>PROTOCOL:</span>
-                <span>HYBRID_REMOTE_SYNC</span>
-              </div>
+            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl">
+              <span className="text-accent text-xs font-mono tracking-widest block mb-4">02 // SPATIAL GRAPHICS</span>
+              <h3 className="text-2xl font-bold text-white mb-3">3D WebGL</h3>
+              <p className="text-white/50 text-sm leading-relaxed font-light">
+                Crafting custom GLSL vertex/fragment shaders, procedural geometries, and optimized particle systems with Three.js.
+              </p>
             </div>
-          </div>
 
-          {/* Bento Cell 3: Metrics & Stats Quad (12 cols) */}
-          <div className="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-            <StatItem
-              number={5}
-              suffix="+"
-              label="Years Crafting"
-              subtext="Continuous Production Experience"
-            />
-            <StatItem
-              number={48}
-              suffix="+"
-              label="Products Shipped"
-              subtext="Enterprise & High-Impact Startups"
-            />
-            <StatItem
-              number={100}
-              suffix="+"
-              label="Shader Experiments"
-              subtext="Custom GLSL & Procedural Physics"
-            />
-            <StatItem
-              number={60}
-              suffix=" FPS"
-              label="Fluid Target"
-              subtext="Strict Sub-16ms Frame Budgets"
-            />
+            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl">
+              <span className="text-accent text-xs font-mono tracking-widest block mb-4">03 // ARCHITECTURE</span>
+              <h3 className="text-2xl font-bold text-white mb-3">Clean Code</h3>
+              <p className="text-white/50 text-sm leading-relaxed font-light">
+                Building scalable, maintainable frontends and robust API systems with React 18, Next.js, TypeScript, and Node.js.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Marquee Velocity Divider */}
-      <div className="w-full py-10 border-y border-white/5 bg-black overflow-hidden relative z-30">
-        <ParallaxText baseVelocity={-2.5} className="text-5xl md:text-8xl font-black text-white/[0.08] uppercase tracking-tighter">
+      {/* Marquee Divider */}
+      <div className="w-full py-10 border-y border-white/5 bg-black overflow-hidden relative z-20">
+        <ParallaxText baseVelocity={-2.5} className="text-5xl md:text-8xl font-display font-black text-white/[0.07] uppercase tracking-tighter">
           CREATIVE • ARCHITECTURE • THREE.JS • GLSL • REACT • SYSTEM DESIGN •
         </ParallaxText>
       </div>

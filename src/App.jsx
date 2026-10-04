@@ -7,8 +7,6 @@ import Navbar from './components/layout/Navbar';
 import CustomCursor from './components/layout/CustomCursor';
 import ScrollProgress from './components/ui/ScrollProgress';
 import GrainOverlay from './components/ui/GrainOverlay';
-import TorchlightGrid from './components/ui/TorchlightGrid';
-import TechnicalHUD from './components/ui/TechnicalHUD';
 import ScrollColorTransition from './components/ui/ScrollColorTransition';
 import Hero from './components/sections/Hero';
 import About from './components/sections/About';
@@ -25,7 +23,6 @@ function App() {
   return (
     <AppProvider>
       <GrainOverlay />
-      <TorchlightGrid />
       <ScrollColorTransition />
 
       <AnimatePresence mode="wait">
@@ -34,11 +31,10 @@ function App() {
 
       {!loading && (
         <>
-          <TechnicalHUD />
           <ScrollProgress />
           <CustomCursor />
           <Navbar />
-          <main className="relative z-10">
+          <main className="relative z-10 bg-black">
             <Hero />
             <About />
             <Projects />
