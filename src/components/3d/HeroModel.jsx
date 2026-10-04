@@ -12,7 +12,7 @@ const vertexShader = `
   varying float vDisplacement;
   varying vec3 vPosition;
 
-  // Simplex 3D noise
+  // Classic Simplex 3D noise
   vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
   vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
   float snoise(vec3 v){
@@ -64,14 +64,13 @@ const vertexShader = `
     
     vec3 pos = position;
     
-    // Multi-layered noise displacement
-    float noise1 = snoise(pos * 1.5 + uTime * 0.2) * 0.15;
-    float noise2 = snoise(pos * 3.0 + uTime * 0.3) * 0.05;
-    float noise3 = snoise(pos * 0.5 + uTime * 0.1) * 0.1;
+    // Multi-frequency noise pulse
+    float noise1 = snoise(pos * 1.2 + uTime * 0.3) * 0.25;
+    float noise2 = snoise(pos * 2.4 - uTime * 0.2) * 0.1;
     
-    // Mouse influence on displacement
-    float mouseInfluence = smoothstep(2.0, 0.0, length(pos.xy - uMouse * 2.0));
-    float displacement = noise1 + noise2 + noise3 + mouseInfluence * 0.15;
+    float mouseDist = length(pos.xy - uMouse * 2.0);
+    float mouseInfluence = smoothstep(1.8, 0.0, mouseDist) * 0.2;
+    float displacement = noise1 + noise2 + mouseInfluence;
     
     pos += normal * displacement;
     
@@ -89,70 +88,70 @@ const fragmentShader = `
   varying vec3 vPosition;
 
   void main() {
-    // Iridescent color palette
-    vec3 color1 = vec3(0.0, 0.443, 0.89);   // #0071e3 blue
-    vec3 color2 = vec3(0.659, 0.333, 0.969); // purple
-    vec3 color3 = vec3(0.0, 0.878, 0.761);   // cyan/teal
-    vec3 color4 = vec3(0.961, 0.388, 0.569); // pink
+    // Ultra-vibrant iridescent palette: Electric Blue, Cyan, Purple, Magenta
+    vec3 cBlue = vec3(0.0, 0.443, 0.89);
+    vec3 cCyan = vec3(0.0, 0.85, 1.0);
+    vec3 cPurple = vec3(0.65, 0.2, 0.95);
+    vec3 cPink = vec3(1.0, 0.2, 0.6);
     
-    // Flow based on noise displacement + time
-    float t = vDisplacement * 4.0 + uTime * 0.15;
+    float t = vDisplacement * 3.5 + uTime * 0.25;
     
-    // Multi-color interpolation for iridescence
-    vec3 color = mix(color1, color2, smoothstep(-0.2, 0.2, sin(t)));
-    color = mix(color, color3, smoothstep(-0.2, 0.2, sin(t * 1.5 + 2.094)));
-    color = mix(color, color4, smoothstep(-0.2, 0.2, sin(t * 0.7 + 4.189)) * 0.3);
+    vec3 color = mix(cBlue, cCyan, smoothstep(-0.2, 0.2, sin(t)));
+    color = mix(color, cPurple, smoothstep(-0.2, 0.2, sin(t + 2.094)));
+    color = mix(color, cPink, smoothstep(-0.2, 0.2, sin(t * 0.8 + 4.189)) * 0.4);
     
-    // Fresnel rim lighting - makes edges glow
+    // Fresnel Rim Glow
     vec3 viewDir = normalize(cameraPosition - vPosition);
-    float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 3.0);
-    color += fresnel * vec3(0.3, 0.5, 1.0) * 0.8;
+    float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.5);
+    color += fresnel * vec3(0.4, 0.8, 1.0) * 1.5;
     
-    // Subtle inner glow based on displacement
-    color += vDisplacement * vec3(0.2, 0.1, 0.4);
+    // Internal luminosity
+    color += (vDisplacement + 0.2) * vec3(0.2, 0.4, 0.8);
     
-    // Slight transparency at edges
-    float alpha = 0.85 + fresnel * 0.15;
-    
-    gl_FragColor = vec4(color, alpha);
+    gl_FragColor = vec4(color, 0.92);
   }
 `;
 
 const HeroModel = () => {
-  const meshRef = useRef();
   const groupRef = useRef();
   const materialRef = useRef();
   
   const { x, y } = useMousePosition();
   const { scrollProgress } = useAppContext();
   
-  const geometry = useMemo(() => new THREE.IcosahedronGeometry(1.5, 64), []);
+  // High-poly geometry for silky displacement
+  const geometry = useMemo(() => new THREE.IcosahedronGeometry(1.6, 64), []);
+
+  const uniforms = useMemo(() => ({
+    uTime: { value: 0 },
+    uMouse: { value: new THREE.Vector2(0, 0) },
+  }), []);
 
   useFrame((state, delta) => {
-    if (materialRef.current) {
-      materialRef.current.uTime += delta;
+    // Safely update shader uniforms
+    if (materialRef.current && materialRef.current.uniforms) {
+      materialRef.current.uniforms.uTime.value += delta;
       
       const mouseX = (x / window.innerWidth) * 2 - 1;
       const mouseY = -(y / window.innerHeight) * 2 + 1;
-      
-      materialRef.current.uMouse.lerp(new THREE.Vector2(mouseX, mouseY), 0.1);
+      materialRef.current.uniforms.uMouse.value.lerp(new THREE.Vector2(mouseX, mouseY), 0.08);
     }
     
     if (groupRef.current) {
-      // Slow base rotation
-      groupRef.current.rotation.x += delta * 0.1;
-      groupRef.current.rotation.y += delta * 0.15;
+      // Base continuous rotation
+      groupRef.current.rotation.x += delta * 0.12;
+      groupRef.current.rotation.y += delta * 0.18;
       
-      // Mouse reactive rotation
-      const targetRotationX = (y / window.innerHeight - 0.5) * 0.5;
-      const targetRotationY = (x / window.innerWidth - 0.5) * 0.5;
+      // Mouse interactive tilt
+      const targetRotationX = (y / window.innerHeight - 0.5) * 0.6;
+      const targetRotationY = (x / window.innerWidth - 0.5) * 0.6;
       groupRef.current.rotation.x += (targetRotationX - groupRef.current.rotation.x) * 0.05;
       groupRef.current.rotation.y += (targetRotationY - groupRef.current.rotation.y) * 0.05;
       
-      // Push back on scroll
+      // Gentle depth push on scroll
       groupRef.current.position.z = THREE.MathUtils.lerp(
         groupRef.current.position.z,
-        -scrollProgress * 5,
+        -(scrollProgress || 0) * 4,
         0.1
       );
     }
@@ -160,27 +159,25 @@ const HeroModel = () => {
 
   return (
     <group ref={groupRef}>
+      {/* Primary Displaced Mesh */}
       <mesh geometry={geometry}>
         <shaderMaterial
           ref={materialRef}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
-          uniforms={{
-            uTime: { value: 0 },
-            uMouse: { value: new THREE.Vector2() }
-          }}
+          uniforms={uniforms}
           transparent={true}
           side={THREE.DoubleSide}
         />
       </mesh>
       
-      {/* Wireframe layer */}
-      <mesh geometry={geometry} scale={1.02}>
+      {/* Outer Luminous Wireframe Halo */}
+      <mesh geometry={geometry} scale={1.03}>
         <meshBasicMaterial 
-          color="#ffffff" 
+          color="#00f2fe" 
           wireframe={true} 
           transparent={true} 
-          opacity={0.03} 
+          opacity={0.08} 
         />
       </mesh>
     </group>

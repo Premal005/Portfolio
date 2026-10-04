@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Float } from '@react-three/drei';
+import { Float } from '@react-three/drei';
 import * as THREE from 'three';
 import HeroModel from './HeroModel';
 import FloatingParticles from './FloatingParticles';
@@ -11,17 +11,16 @@ const CyclingLight = () => {
   useFrame((state) => {
     if (lightRef.current) {
       const time = state.clock.getElapsedTime();
-      // Shift hue slowly
-      lightRef.current.color.setHSL((time * 0.1) % 1, 0.8, 0.5);
+      lightRef.current.color.setHSL((time * 0.08) % 1, 0.9, 0.6);
     }
   });
 
   return (
     <pointLight 
       ref={lightRef}
-      position={[2, 0, 2]} 
-      intensity={0.5} 
-      distance={10} 
+      position={[3, 1, 3]} 
+      intensity={3} 
+      distance={14} 
     />
   );
 };
@@ -29,23 +28,24 @@ const CyclingLight = () => {
 const SceneContent = () => {
   return (
     <>
-      <fog attach="fog" args={['#000000', 3, 12]} />
+      <fog attach="fog" args={['#000000', 6, 25]} />
       
-      <ambientLight intensity={0.2} />
-      <directionalLight position={[5, 5, 5]} intensity={1} />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[6, 6, 6]} intensity={2} color="#ffffff" />
       
-      {/* Accent lights */}
-      <pointLight position={[-3, 2, -3]} color="#0071e3" intensity={2} distance={10} />
-      <pointLight position={[3, -2, 3]} color="#a855f7" intensity={0.5} distance={10} />
+      {/* Dynamic Cyber Studio Lights */}
+      <pointLight position={[-4, 3, 2]} color="#0071e3" intensity={4} distance={15} />
+      <pointLight position={[4, -3, 2]} color="#a855f7" intensity={3} distance={15} />
+      <pointLight position={[0, 0, 4]} color="#00f2fe" intensity={2} distance={10} />
       
       <CyclingLight />
 
-      <Environment preset="city" />
-
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+      {/* Centerpiece 3D Holographic Sculpture */}
+      <Float speed={2.5} rotationIntensity={0.6} floatIntensity={1.2}>
         <HeroModel />
       </Float>
       
+      {/* 2000 Dynamic Floating Particles */}
       <FloatingParticles count={2000} />
     </>
   );
@@ -54,13 +54,13 @@ const SceneContent = () => {
 const Scene = () => {
   return (
     <Canvas
-      camera={{ position: [0, 0, 5], fov: 45 }}
+      camera={{ position: [0, 0, 5.2], fov: 45 }}
       dpr={[1, 2]}
       gl={{ 
         antialias: true, 
         alpha: true,
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.2
+        toneMappingExposure: 1.4
       }}
       className="w-full h-full"
     >
