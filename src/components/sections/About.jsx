@@ -1,28 +1,30 @@
 import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import InteractiveTerminal from '../ui/InteractiveTerminal';
 import ParallaxText from '../ui/ParallaxText';
+import SplitTextHover from '../ui/SplitTextHover';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Stat = ({ number, label, suffix = '' }) => {
+const StatItem = ({ number, label, suffix = '', subtext = '' }) => {
   const numberRef = useRef(null);
 
   useEffect(() => {
     const el = numberRef.current;
     const counter = { val: 0 };
-    
+
     const tween = gsap.to(counter, {
       val: number,
       duration: 2,
       ease: 'power3.out',
       scrollTrigger: {
         trigger: el,
-        start: 'top 80%',
+        start: 'top 85%',
       },
       onUpdate: () => {
-        el.innerText = Math.ceil(counter.val) + suffix;
-      }
+        if (el) el.innerText = Math.ceil(counter.val) + suffix;
+      },
     });
 
     return () => {
@@ -32,132 +34,154 @@ const Stat = ({ number, label, suffix = '' }) => {
   }, [number, suffix]);
 
   return (
-    <div className="flex flex-col gap-1">
-      <span ref={numberRef} className="text-6xl md:text-7xl font-bold text-white">0</span>
-      <span className="text-white/50 text-sm uppercase tracking-wider">{label}</span>
+    <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md flex flex-col justify-between group hover:border-accent/40 transition-colors duration-500">
+      <div className="flex items-baseline justify-between mb-4">
+        <span ref={numberRef} className="text-4xl md:text-5xl font-black text-white tracking-tight">
+          0{suffix}
+        </span>
+        <span className="w-2 h-2 rounded-full bg-accent/60 group-hover:scale-150 transition-transform duration-300" />
+      </div>
+      <div>
+        <h4 className="text-sm font-bold text-white/90 uppercase tracking-wider">{label}</h4>
+        {subtext && <p className="text-xs text-white/40 mt-1 font-mono">{subtext}</p>}
+      </div>
     </div>
   );
 };
 
 const About = () => {
-  const sectionRef = useRef(null);
-  const stickyRef = useRef(null);
-  const imageContainerRef = useRef(null);
-  const contentRef = useRef(null);
-  const textWordsRef = useRef([]);
-  
+  const containerRef = useRef(null);
+  const headerRef = useRef(null);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: true,
+      gsap.fromTo(
+        headerRef.current,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+          },
         }
-      });
-
-      // Phase 1 (0-40%): Image reveals from invisible point to fully visible
-      tl.fromTo(imageContainerRef.current,
-        { clipPath: 'inset(50% 50% 50% 50%)', scale: 1.2 },
-        { clipPath: 'inset(0% 0% 0% 0%)', scale: 1, duration: 0.4, ease: 'none' },
-        0
       );
+    }, containerRef);
 
-      // Phase 2 (40-70%): Image scales down and moves left. Text fades in on right.
-      tl.to(imageContainerRef.current, {
-        width: '40vw',
-        x: '-25vw',
-        duration: 0.3,
-        ease: 'power2.inOut'
-      }, 0.4);
-
-      tl.fromTo(contentRef.current, {
-        opacity: 0,
-        x: 50,
-      }, {
-        opacity: 1,
-        x: 0,
-        duration: 0.3,
-        ease: 'power2.out'
-      }, 0.45);
-
-      // Words reveal inside the paragraph
-      tl.fromTo(textWordsRef.current, {
-        opacity: 0,
-        y: 20
-      }, {
-        opacity: 1,
-        y: 0,
-        stagger: 0.01,
-        duration: 0.2,
-        ease: 'power1.out'
-      }, 0.5);
-
-      // Phase 3 (70-100%): Stats and remainder fully visible
-      // (Stats will trigger their own counters when they enter viewport, 
-      // but their container fades in here)
-    }, sectionRef);
-    
     return () => ctx.revert();
   }, []);
 
-  const bioText = "I am a passionate frontend developer specializing in building premium, interactive digital experiences. With a strong foundation in modern web technologies and a keen eye for design, I transform complex problems into elegant, user-friendly solutions.";
-  const words = bioText.split(" ");
-
   return (
     <>
-      <section id="about" ref={sectionRef} className="min-h-[200vh] relative bg-black">
-        <div ref={stickyRef} className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
-          
-          {/* Image Placeholder */}
-          <div 
-            ref={imageContainerRef} 
-            className="absolute z-10 w-[60vw] aspect-video md:aspect-square md:w-[60vw] max-h-[80vh] bg-gradient-to-br from-accent/30 to-purple-500/30 rounded-2xl flex items-center justify-center"
-          >
-            <span className="text-white font-bold text-4xl tracking-widest">YOUR PHOTO</span>
-          </div>
-
-          {/* Right Content Area (Hidden initially, slides in) */}
-          <div 
-            ref={contentRef} 
-            className="absolute right-[5vw] w-[45vw] opacity-0 flex flex-col justify-center z-20"
-          >
-            <span className="uppercase tracking-widest text-accent text-sm font-semibold mb-4 block">
-              About Me
+      <section id="about" ref={containerRef} className="relative min-h-screen py-32 px-6 md:px-14 lg:px-20">
+        {/* Section Header */}
+        <div ref={headerRef} className="max-w-4xl mb-20">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-6 h-[1px] bg-accent" />
+            <span className="text-accent text-xs font-mono uppercase tracking-[0.3em] font-semibold">
+              ✦ 01 // ARCHITECTURAL DOSSIER
             </span>
-            
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-8">
-              I build things for the web.
-            </h2>
+          </div>
 
-            <div className="text-xl md:text-3xl text-white/70 font-light leading-relaxed mb-16 flex flex-wrap gap-x-2">
-              {words.map((word, i) => (
-                <span 
-                  key={i} 
-                  ref={el => textWordsRef.current[i] = el}
-                  className="opacity-0 inline-block"
-                >
-                  {word}
+          <SplitTextHover
+            text="ENGINEERING & CRAFT"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter block"
+            repelRadius={90}
+            repelStrength={18}
+          />
+
+          <p className="text-white/40 text-lg md:text-xl font-light mt-6 leading-relaxed max-w-2xl">
+            Bridging raw computational performance with bespoke creative motion. Every interaction is
+            engineered with sub-millisecond precision.
+          </p>
+        </div>
+
+        {/* BENTO GRID 2.0 */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-7xl mx-auto">
+          {/* Bento Cell 1: Interactive Cyber Terminal (7 cols) */}
+          <div className="lg:col-span-7 flex flex-col">
+            <InteractiveTerminal />
+          </div>
+
+          {/* Bento Cell 2: Global Telemetry & Radar Beacon (5 cols) */}
+          <div className="lg:col-span-5 p-7 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors duration-500">
+            {/* Background Radar Rings */}
+            <div className="absolute -right-16 -top-16 w-64 h-64 border border-accent/15 rounded-full pointer-events-none group-hover:border-accent/30 transition-colors" />
+            <div className="absolute -right-16 -top-16 w-48 h-48 border border-white/5 rounded-full pointer-events-none" />
+            <div className="absolute -right-16 -top-16 w-32 h-32 border border-accent/20 rounded-full pointer-events-none" />
+
+            <div>
+              <div className="flex items-center justify-between text-[11px] font-mono text-white/40 tracking-widest uppercase mb-8">
+                <span>BEACON // TELEMETRY</span>
+                <span className="flex items-center gap-2 text-emerald-400">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  AVAILABLE
                 </span>
-              ))}
+              </div>
+
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                Global Operations
+              </h3>
+              <p className="text-sm text-white/50 leading-relaxed font-light mb-6">
+                Operating remotely across global timezones. Ready to deploy specialized architecture for world-class
+                teams and ambitious design systems.
+              </p>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-8 w-full border-t border-white/10 pt-8">
-              <Stat number={5} label="Years Exp." suffix="+" />
-              <Stat number={50} label="Projects" suffix="+" />
-              <Stat number={10} label="Awards" />
+            {/* Radar Coordinates Box */}
+            <div className="p-4 rounded-xl bg-black/40 border border-white/10 font-mono text-xs space-y-2">
+              <div className="flex justify-between text-white/60">
+                <span>BASE COORD:</span>
+                <span className="text-accent font-bold">28.6139° N, 77.2090° E</span>
+              </div>
+              <div className="flex justify-between text-white/60">
+                <span>DEPLOY STATUS:</span>
+                <span className="text-emerald-400">READY_FOR_COMMISSION</span>
+              </div>
+              <div className="flex justify-between text-white/60">
+                <span>PROTOCOL:</span>
+                <span>HYBRID_REMOTE_SYNC</span>
+              </div>
             </div>
           </div>
 
+          {/* Bento Cell 3: Metrics & Stats Quad (12 cols) */}
+          <div className="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+            <StatItem
+              number={5}
+              suffix="+"
+              label="Years Crafting"
+              subtext="Continuous Production Experience"
+            />
+            <StatItem
+              number={48}
+              suffix="+"
+              label="Products Shipped"
+              subtext="Enterprise & High-Impact Startups"
+            />
+            <StatItem
+              number={100}
+              suffix="+"
+              label="Shader Experiments"
+              subtext="Custom GLSL & Procedural Physics"
+            />
+            <StatItem
+              number={60}
+              suffix=" FPS"
+              label="Fluid Target"
+              subtext="Strict Sub-16ms Frame Budgets"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Marquee Divider */}
-      <div className="w-full py-8 border-y border-white/5 bg-black overflow-hidden relative z-30">
-        <ParallaxText baseVelocity={-2}>
-          CREATIVE • DEVELOPER • DESIGNER • ENGINEER • 
+      {/* Marquee Velocity Divider */}
+      <div className="w-full py-10 border-y border-white/5 bg-black overflow-hidden relative z-30">
+        <ParallaxText baseVelocity={-2.5} className="text-5xl md:text-8xl font-black text-white/[0.08] uppercase tracking-tighter">
+          CREATIVE • ARCHITECTURE • THREE.JS • GLSL • REACT • SYSTEM DESIGN •
         </ParallaxText>
       </div>
     </>
