@@ -10,7 +10,6 @@ import GrainOverlay from './components/ui/GrainOverlay';
 import TorchlightGrid from './components/ui/TorchlightGrid';
 import TechnicalHUD from './components/ui/TechnicalHUD';
 import ScrollColorTransition from './components/ui/ScrollColorTransition';
-import ScrollSkew from './components/ui/ScrollSkew';
 import Hero from './components/sections/Hero';
 import About from './components/sections/About';
 import Projects from './components/sections/Projects';
@@ -39,16 +38,14 @@ function App() {
           <ScrollProgress />
           <CustomCursor />
           <Navbar />
-          <ScrollSkew>
-            <main>
-              <Hero />
-              <About />
-              <Projects />
-              <Skills />
-              <Experience />
-              <Contact />
-            </main>
-          </ScrollSkew>
+          <main className="relative z-10">
+            <Hero />
+            <About />
+            <Projects />
+            <Skills />
+            <Experience />
+            <Contact />
+          </main>
           <Footer />
         </>
       )}

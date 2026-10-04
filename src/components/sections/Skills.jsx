@@ -1,120 +1,156 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SKILL_ROWS = [
-  [
-    { name: 'React', icon: '⚛️' }, { name: 'Node.js', icon: '🟢' }, { name: 'Three.js', icon: '🔺' }, 
-    { name: 'TypeScript', icon: '📘' }, { name: 'Next.js', icon: '▲' }, { name: 'Python', icon: '🐍' }, 
-    { name: 'GraphQL', icon: '🕸️' }, { name: 'Docker', icon: '🐳' }, { name: 'Rust', icon: '🦀' }, { name: 'Go', icon: '🐹' }
-  ],
-  [
-    { name: 'GSAP', icon: '💚' }, { name: 'Framer Motion', icon: '🌊' }, { name: 'Tailwind CSS', icon: '💨' }, 
-    { name: 'Figma', icon: '🎨' }, { name: 'PostgreSQL', icon: '🐘' }, { name: 'Redis', icon: '🔴' }, 
-    { name: 'AWS', icon: '☁️' }, { name: 'Kubernetes', icon: '☸️' }, { name: 'Terraform', icon: '🏗️' }, { name: 'Linux', icon: '🐧' }
-  ],
-  [
-    { name: 'WebGL', icon: '🧊' }, { name: 'GLSL', icon: '✨' }, { name: 'React Native', icon: '📱' }, 
-    { name: 'Vue.js', icon: '💚' }, { name: 'Svelte', icon: '🔥' }, { name: 'Express', icon: '🚂' }, 
-    { name: 'MongoDB', icon: '🍃' }, { name: 'Firebase', icon: '🔥' }, { name: 'Prisma', icon: '💎' }, { name: 'tRPC', icon: '🔄' }
-  ]
+const SKILL_DOMAINS = [
+  {
+    category: '01 // CREATIVE 3D & MOTION',
+    description: 'Engineering spatial graphics, custom GLSL shaders, and buttery 60fps micro-animations.',
+    skills: [
+      { name: 'Three.js', tag: 'Core WebGL', level: '96%' },
+      { name: 'React Three Fiber', tag: 'R3F / Drei', level: '94%' },
+      { name: 'GLSL Shaders', tag: 'Vertex & Fragment', level: '90%' },
+      { name: 'GSAP ScrollTrigger', tag: 'Choreography', level: '98%' },
+      { name: 'Framer Motion', tag: 'Spring Physics', level: '95%' },
+      { name: 'Lenis', tag: 'Inertia Smoothing', level: '92%' },
+    ],
+  },
+  {
+    category: '02 // FRONTEND & UI SYSTEMS',
+    description: 'Crafting responsive, accessible, ultra-performant client-side architectures.',
+    skills: [
+      { name: 'React 18', tag: 'Concurrent Mode', level: '98%' },
+      { name: 'TypeScript', tag: 'Type Safety', level: '95%' },
+      { name: 'Next.js 14', tag: 'App Router / SSR', level: '92%' },
+      { name: 'Tailwind CSS', tag: 'Design Tokens', level: '99%' },
+      { name: 'Vite', tag: 'ESM Tooling', level: '94%' },
+      { name: 'Figma to Code', tag: 'Pixel Perfection', level: '96%' },
+    ],
+  },
+  {
+    category: '03 // BACKEND & CLOUD SYSTEMS',
+    description: 'Building secure, scalable API backbones and distributed database architectures.',
+    skills: [
+      { name: 'Node.js', tag: 'Runtime Engine', level: '92%' },
+      { name: 'Express / REST', tag: 'API Gateway', level: '90%' },
+      { name: 'PostgreSQL', tag: 'Relational DB', level: '88%' },
+      { name: 'MongoDB', tag: 'NoSQL Schema', level: '90%' },
+      { name: 'Docker', tag: 'Containerization', level: '85%' },
+      { name: 'Git & CI/CD', tag: 'Automated Deploy', level: '94%' },
+    ],
+  },
 ];
 
 const Skills = () => {
   const sectionRef = useRef(null);
+  const headerRef = useRef(null);
 
   useEffect(() => {
-    let ctx = gsap.context(() => {
-      // Velocity-based scroll speed
-      let scrollVelocity = 0;
-      let lastScroll = window.scrollY;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        headerRef.current,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+          },
+        }
+      );
 
-      const updateScrollVelocity = () => {
-        const currentScroll = window.scrollY;
-        scrollVelocity = Math.abs(currentScroll - lastScroll);
-        lastScroll = currentScroll;
-        
-        // Map velocity to speed factor
-        const speedFactor = 1 + Math.min(scrollVelocity * 0.05, 5);
-        
-        gsap.to('.skill-row-inner', {
-          timeScale: speedFactor,
-          duration: 0.5,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-
-        // Reset speed to normal when scroll stops
-        gsap.to('.skill-row-inner', {
-          timeScale: 1,
-          duration: 1.5,
-          delay: 0.1,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      };
-
-      window.addEventListener('scroll', updateScrollVelocity);
-      
-      // Initial infinite scroll animations for rows
-      const rows = gsap.utils.toArray('.skill-row-inner');
-      rows.forEach((row, i) => {
-        const direction = i % 2 !== 0 ? 1 : -1;
-        const duration = i === 0 ? 30 : i === 1 ? 25 : 35;
-        
-        gsap.to(row, {
-          xPercent: direction * -50,
-          ease: "none",
-          duration: duration,
-          repeat: -1,
-        });
+      gsap.utils.toArray('.domain-card').forEach((card) => {
+        gsap.fromTo(
+          card,
+          { y: 60, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 85%',
+            },
+          }
+        );
       });
-      
-      return () => {
-        window.removeEventListener('scroll', updateScrollVelocity);
-      };
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section id="skills" ref={sectionRef} className="py-40 bg-black overflow-hidden relative">
-      <div className="container mx-auto px-6 mb-24 text-center">
-        <p className="text-accent uppercase tracking-widest text-sm font-semibold mb-4">Capabilities</p>
-        <h2 className="text-5xl md:text-7xl font-bold text-white">Skills & Arsenal</h2>
-      </div>
+    <section id="skills" ref={sectionRef} className="py-32 bg-black relative">
+      <div className="max-w-7xl mx-auto px-6 md:px-14 lg:px-20">
+        {/* Header */}
+        <div ref={headerRef} className="mb-20">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-6 h-[1px] bg-accent" />
+            <span className="text-accent text-xs font-mono uppercase tracking-[0.3em] font-semibold">
+              ✦ 02 // TECHNICAL ARSENAL
+            </span>
+          </div>
 
-      <div className="flex flex-col gap-8 relative z-10 w-full overflow-hidden">
-        {SKILL_ROWS.map((row, rowIndex) => (
-          <div 
-            key={rowIndex} 
-            className={`flex whitespace-nowrap overflow-visible py-4 hover:[&_.skill-row-inner]:[animation-play-state:paused]`}
-          >
-            <div className="skill-row-inner flex gap-6 w-max" style={{ width: 'fit-content' }}>
-              {[...Array(4)].map((_, i) => (
-                <React.Fragment key={i}>
-                  {row.map((skill, j) => (
-                    <div 
-                      key={`${i}-${j}`} 
-                      className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-8 py-4 flex items-center gap-4 transition-all duration-300 hover:scale-115 hover:border-accent hover:bg-white/10 cursor-pointer relative"
+          <h2 className="text-4xl sm:text-6xl md:text-7xl font-display font-black text-white tracking-tight uppercase">
+            Specialized Skills
+          </h2>
+
+          <p className="text-white/40 text-lg font-light mt-4 max-w-xl">
+            A comprehensive overview of production-tested technologies, libraries, and frameworks deployed across modern applications.
+          </p>
+        </div>
+
+        {/* Domain Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {SKILL_DOMAINS.map((domain, i) => (
+            <div
+              key={i}
+              className="domain-card p-8 rounded-3xl bg-white/[0.02] border border-white/10 backdrop-blur-xl flex flex-col justify-between hover:border-accent/40 transition-colors duration-500 group"
+            >
+              <div>
+                <span className="text-accent text-xs font-mono tracking-widest uppercase block mb-3 font-semibold">
+                  {domain.category}
+                </span>
+                <p className="text-white/50 text-xs leading-relaxed mb-8 font-light">
+                  {domain.description}
+                </p>
+
+                {/* Skill Items */}
+                <div className="space-y-3">
+                  {domain.skills.map((skill, j) => (
+                    <div
+                      key={j}
+                      className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between group/item hover:bg-white/[0.06] hover:border-white/15 transition-all duration-300"
                     >
-                      <span className="text-2xl">{skill.icon}</span>
-                      <span className="text-white text-xl font-medium">{skill.name}</span>
-                      
-                      {/* Tooltip */}
-                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white text-black px-4 py-1.5 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                        Expert
+                      <div>
+                        <div className="text-white font-medium text-sm group-hover/item:text-accent transition-colors">
+                          {skill.name}
+                        </div>
+                        <div className="text-[10px] text-white/40 font-mono tracking-wider">
+                          {skill.tag}
+                        </div>
                       </div>
+                      <span className="text-xs font-mono text-accent font-semibold px-2 py-0.5 rounded bg-accent/10">
+                        {skill.level}
+                      </span>
                     </div>
                   ))}
-                </React.Fragment>
-              ))}
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-white/30">
+                <span>BENCHMARK // VERIFIED</span>
+                <span className="text-emerald-400">READY</span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

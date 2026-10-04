@@ -4,13 +4,19 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        display: ['Syne', 'Space Grotesk', 'sans-serif'],
+        sans: ['Space Grotesk', 'Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
+        canvas: '#070709',
+        surface: '#0e0f14',
+        card: '#12131a',
         accent: '#0071e3',
-        'accent-light': '#4da3ff',
-        'accent-dark': '#004fb3',
+        'accent-light': '#3894ff',
+        'accent-dark': '#0054a8',
         'accent-blue': '#0071e3',
+        neon: '#00f2fe',
       },
       animation: {
         marquee: 'marquee 25s linear infinite',
@@ -19,6 +25,7 @@ export default {
         'pulse-slow': 'pulse 4s ease-in-out infinite',
         float: 'float 6s ease-in-out infinite',
         gradient: 'gradient-shift 3s ease infinite',
+        shimmer: 'shimmer 2.5s infinite',
       },
       keyframes: {
         marquee: {
@@ -36,7 +43,10 @@ export default {
         'gradient-shift': {
           '0%': { 'background-position': '0% 50%' },
           '50%': { 'background-position': '100% 50%' },
-          '100%': { 'background-position': '0% 50%' }
+          '100%': { 'background-position': '0% 50%' },
+        },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
         },
       },
       transitionTimingFunction: {

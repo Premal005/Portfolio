@@ -4,7 +4,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Scene from '../3d/Scene';
 import MagneticButton from '../ui/MagneticButton';
-import SplitTextHover from '../ui/SplitTextHover';
 import { useAppContext } from '../../context/AppContext';
 import { useMousePosition } from '../../hooks/useMousePosition';
 
@@ -13,108 +12,77 @@ gsap.registerPlugin(ScrollTrigger);
 const Hero = () => {
   const containerRef = useRef(null);
   const stickyRef = useRef(null);
-  const textRef = useRef(null);
-  const line1Ref = useRef(null);
-  const line2Ref = useRef(null);
-  const line3Ref = useRef(null);
+  const contentRef = useRef(null);
+  const title1Ref = useRef(null);
+  const title2Ref = useRef(null);
+  const title3Ref = useRef(null);
+  const badgeRef = useRef(null);
   const subtitleRef = useRef(null);
   const ctaRef = useRef(null);
+  const metricsRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
-  const overlayRef = useRef(null);
 
   const mouse = useMousePosition();
   const { setCursorVariant } = useAppContext();
 
-  // Mouse-following orbs with different spring rates
+  // Mouse-following smooth ambient orbs
   const orbX1 = useMotionValue(0);
   const orbY1 = useMotionValue(0);
   const orbX2 = useMotionValue(0);
   const orbY2 = useMotionValue(0);
-  const orbX3 = useMotionValue(0);
-  const orbY3 = useMotionValue(0);
 
-  const s1x = useSpring(orbX1, { stiffness: 20, damping: 15, mass: 2 });
-  const s1y = useSpring(orbY1, { stiffness: 20, damping: 15, mass: 2 });
-  const s2x = useSpring(orbX2, { stiffness: 12, damping: 12, mass: 3 });
-  const s2y = useSpring(orbY2, { stiffness: 12, damping: 12, mass: 3 });
-  const s3x = useSpring(orbX3, { stiffness: 8, damping: 10, mass: 4 });
-  const s3y = useSpring(orbY3, { stiffness: 8, damping: 10, mass: 4 });
+  const s1x = useSpring(orbX1, { stiffness: 25, damping: 18, mass: 1.5 });
+  const s1y = useSpring(orbY1, { stiffness: 25, damping: 18, mass: 1.5 });
+  const s2x = useSpring(orbX2, { stiffness: 15, damping: 14, mass: 2.5 });
+  const s2y = useSpring(orbY2, { stiffness: 15, damping: 14, mass: 2.5 });
 
   useEffect(() => {
     const cx = mouse.x - window.innerWidth / 2;
     const cy = mouse.y - window.innerHeight / 2;
-    orbX1.set(cx * 0.3);
-    orbY1.set(cy * 0.3);
-    orbX2.set(cx * 0.5);
-    orbY2.set(cy * 0.5);
-    orbX3.set(cx * 0.7);
-    orbY3.set(cy * 0.7);
-  }, [mouse.x, mouse.y]);
+    orbX1.set(cx * 0.35);
+    orbY1.set(cy * 0.35);
+    orbX2.set(cx * 0.55);
+    orbY2.set(cy * 0.55);
+  }, [mouse.x, mouse.y, orbX1, orbX2, orbY1, orbY2]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Initial states
-      gsap.set([line1Ref.current, line2Ref.current, line3Ref.current], {
-        scale: 2.5, opacity: 0, y: 60, filter: 'blur(10px)',
-      });
-      gsap.set(subtitleRef.current, { y: 80, opacity: 0 });
-      gsap.set(ctaRef.current, { y: 60, opacity: 0, scale: 0.8 });
+      // Kinetic Entrance Reveal
+      const enterTl = gsap.timeline({ delay: 0.2 });
+      enterTl.fromTo(
+        badgeRef.current,
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+      );
+      enterTl.fromTo(
+        [title1Ref.current, title2Ref.current, title3Ref.current],
+        { y: 80, opacity: 0, skewY: 4 },
+        { y: 0, opacity: 1, skewY: 0, duration: 1.2, stagger: 0.12, ease: 'power4.out' },
+        '-=0.5'
+      );
+      enterTl.fromTo(
+        [subtitleRef.current, ctaRef.current, metricsRef.current],
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' },
+        '-=0.6'
+      );
 
-      // Main scroll timeline
-      const tl = gsap.timeline({
+      // Scroll choreography tied to 250vh scroll distance
+      const scrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: '80% top',
-          scrub: 0.8,
-          pin: false,
-        },
-      });
-
-      // Phase 1: Text scales in dramatically (0-35%)
-      tl.to(line1Ref.current, {
-        scale: 1, opacity: 1, y: 0, filter: 'blur(0px)',
-        duration: 0.25, ease: 'power3.out',
-      }, 0);
-      tl.to(line2Ref.current, {
-        scale: 1, opacity: 1, y: 0, filter: 'blur(0px)',
-        duration: 0.25, ease: 'power3.out',
-      }, 0.05);
-      tl.to(line3Ref.current, {
-        scale: 1, opacity: 1, y: 0, filter: 'blur(0px)',
-        duration: 0.25, ease: 'power3.out',
-      }, 0.1);
-
-      // Phase 2: Subtitle & CTA appear (35-55%)
-      tl.to(subtitleRef.current, {
-        y: 0, opacity: 1, duration: 0.15, ease: 'power2.out',
-      }, 0.35);
-      tl.to(ctaRef.current, {
-        y: 0, opacity: 1, scale: 1, duration: 0.15, ease: 'back.out(1.7)',
-      }, 0.4);
-
-      // Phase 3: Everything exits up (65-100%)
-      tl.to(textRef.current, {
-        y: -200, opacity: 0, scale: 0.9, filter: 'blur(8px)',
-        duration: 0.35, ease: 'power2.in',
-      }, 0.65);
-
-      // Scroll indicator
-      gsap.to(scrollIndicatorRef.current, {
-        y: 15, opacity: 0,
-        duration: 1.8, repeat: -1, yoyo: true,
-        ease: 'power2.inOut',
-      });
-
-      // Parallax overlay
-      gsap.to(overlayRef.current, {
-        opacity: 0.6,
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: '60% top',
           end: 'bottom top',
-          scrub: true,
+          scrub: 1,
         },
+      });
+
+      scrollTl.to(contentRef.current, {
+        y: -180,
+        opacity: 0,
+        scale: 0.94,
+        filter: 'blur(10px)',
+        ease: 'none',
       });
     }, containerRef);
 
@@ -122,114 +90,117 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="hero" ref={containerRef} className="h-[300vh] relative">
-      <div ref={stickyRef} className="sticky top-0 h-screen w-full overflow-hidden">
-        
-        {/* 3D Scene - full background */}
+    <section id="hero" ref={containerRef} className="h-[240vh] relative bg-black">
+      <div ref={stickyRef} className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+        {/* 1. 3D WebGL Canvas Layer */}
         <div className="absolute inset-0 z-0">
           <Scene />
         </div>
 
-        {/* Dark overlay that fades in on scroll */}
-        <div ref={overlayRef} className="absolute inset-0 bg-black/0 z-[1] pointer-events-none" />
-
-        {/* Mouse-following gradient orbs */}
-        <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
+        {/* 2. Soft Mouse-Reactive Ambient Light Fields */}
+        <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
           <motion.div
-            className="absolute top-1/2 left-1/2 w-[700px] h-[700px] rounded-full"
+            className="absolute top-1/2 left-1/2 w-[750px] h-[750px] rounded-full pointer-events-none"
             style={{
-              x: s1x, y: s1y,
-              background: 'radial-gradient(circle, rgba(0,113,227,0.15) 0%, transparent 70%)',
-              filter: 'blur(60px)',
+              x: s1x,
+              y: s1y,
+              background: 'radial-gradient(circle, rgba(0,113,227,0.18) 0%, transparent 65%)',
+              filter: 'blur(70px)',
               transform: 'translate(-50%, -50%)',
             }}
           />
           <motion.div
-            className="absolute top-1/2 left-1/2 w-[500px] h-[500px] rounded-full"
+            className="absolute top-1/2 left-1/2 w-[550px] h-[550px] rounded-full pointer-events-none"
             style={{
-              x: s2x, y: s2y,
-              background: 'radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)',
-              filter: 'blur(80px)',
-              transform: 'translate(-50%, -50%)',
-            }}
-          />
-          <motion.div
-            className="absolute top-1/2 left-1/2 w-[400px] h-[400px] rounded-full"
-            style={{
-              x: s3x, y: s3y,
-              background: 'radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)',
-              filter: 'blur(100px)',
+              x: s2x,
+              y: s2y,
+              background: 'radial-gradient(circle, rgba(168,85,247,0.14) 0%, transparent 65%)',
+              filter: 'blur(90px)',
               transform: 'translate(-50%, -50%)',
             }}
           />
         </div>
 
-        {/* Main content */}
+        {/* 3. Hero Content */}
         <div
-          ref={textRef}
-          className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4"
+          ref={contentRef}
+          className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center will-change-transform pt-12 md:pt-0"
         >
-          {/* Line 1 */}
-          <div ref={line1Ref} className="origin-center will-change-transform">
-            <SplitTextHover
-              text="CRAFTING"
-              className="text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[11rem] xl:text-[13rem] font-black leading-[0.85] text-white tracking-tighter"
-              repelRadius={120}
-              repelStrength={25}
-            />
-          </div>
-
-          {/* Line 2 */}
-          <div ref={line2Ref} className="origin-center will-change-transform">
-            <SplitTextHover
-              text="DIGITAL"
-              className="text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[11rem] xl:text-[13rem] font-black leading-[0.85] text-white tracking-tighter"
-              repelRadius={120}
-              repelStrength={25}
-            />
-          </div>
-
-          {/* Line 3 - Gradient */}
-          <div ref={line3Ref} className="origin-center will-change-transform">
-            <span className="text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[11rem] xl:text-[13rem] font-black leading-[0.85] tracking-tighter gradient-text">
-              EXPERIENCES
+          {/* Status Capsule Badge */}
+          <div ref={badgeRef} className="mb-8 inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-xl">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] font-mono tracking-widest text-white/70 uppercase">
+              Premal Goyal // Full Stack & Creative 3D Engineer
             </span>
           </div>
+
+          {/* Majestic Display Headline */}
+          <h1 className="font-display font-black tracking-[-0.04em] leading-[0.88] text-white flex flex-col items-center">
+            <span ref={title1Ref} className="text-5xl sm:text-7xl md:text-9xl lg:text-[10.5rem] xl:text-[12rem] block uppercase">
+              ARCHITECTING
+            </span>
+            <span ref={title2Ref} className="text-5xl sm:text-7xl md:text-9xl lg:text-[10.5rem] xl:text-[12rem] block uppercase">
+              THE DIGITAL
+            </span>
+            <span
+              ref={title3Ref}
+              className="text-5xl sm:text-7xl md:text-9xl lg:text-[10.5rem] xl:text-[12rem] block uppercase gradient-text"
+            >
+              EXPERIENCES
+            </span>
+          </h1>
 
           {/* Subtitle */}
           <p
             ref={subtitleRef}
-            className="mt-8 text-lg md:text-xl lg:text-2xl text-white/50 max-w-2xl font-light leading-relaxed"
+            className="mt-8 text-base sm:text-lg md:text-2xl text-white/50 max-w-2xl font-sans font-light leading-relaxed tracking-normal"
           >
-            Full Stack Developer blending creative design with technical excellence
-            to build immersive digital products.
+            Engineering bespoke web systems, interactive 3D WebGL experiences, and cloud-native software
+            with relentless attention to craft and speed.
           </p>
 
-          {/* CTA Buttons */}
-          <div ref={ctaRef} className="mt-12 flex gap-4 flex-wrap justify-center">
+          {/* Call to Actions */}
+          <div ref={ctaRef} className="mt-10 flex items-center gap-4 flex-wrap justify-center">
             <MagneticButton
               variant="primary"
               onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              View My Work →
+              Explore Projects ↓
             </MagneticButton>
             <MagneticButton
               variant="secondary"
               onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Get In Touch
+              Initialize Contact ↗
             </MagneticButton>
+          </div>
+
+          {/* Bottom Telemetry Strip in Hero */}
+          <div
+            ref={metricsRef}
+            className="mt-14 hidden md:flex items-center gap-8 text-[11px] font-mono text-white/30 tracking-[0.2em] border-t border-white/10 pt-6"
+          >
+            <span>[05+ YEARS PRODUCTION]</span>
+            <span className="text-white/15">•</span>
+            <span>[REACT 18 & THREE.JS CORE]</span>
+            <span className="text-white/15">•</span>
+            <span>[SUB-16MS 60FPS TARGET]</span>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div ref={scrollIndicatorRef} className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-10">
-          <span className="text-white/30 text-[10px] tracking-[0.3em] uppercase font-medium">Scroll to explore</span>
-          <div className="w-[1px] h-16 bg-gradient-to-b from-white/50 via-white/20 to-transparent" />
+        {/* Scroll Indicator */}
+        <div ref={scrollIndicatorRef} className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none">
+          <div className="w-5 h-9 rounded-full border border-white/20 flex items-start justify-center p-1.5">
+            <div className="w-1 h-2 rounded-full bg-accent animate-bounce" />
+          </div>
+          <span className="text-white/30 text-[9px] font-mono uppercase tracking-[0.25em]">SCROLL</span>
         </div>
 
-        {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black to-transparent z-[3] pointer-events-none" />
+        {/* Bottom Fade Gradient */}
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black to-transparent z-[2] pointer-events-none" />
       </div>
     </section>
   );
