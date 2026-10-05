@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import Scene from '../3d/Scene';
 import MagneticButton from '../ui/MagneticButton';
-import CinematicTitleTyping from '../ui/CinematicTitleTyping';
+import AnimatedText from '../ui/AnimatedText';
 import TypewriterRole from '../ui/TypewriterRole';
 import { useAppContext } from '../../context/AppContext';
 
@@ -38,7 +38,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-5 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl pointer-events-auto"
+          className="mb-6 inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-xl pointer-events-auto"
         >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -49,16 +49,26 @@ const Hero = () => {
           </span>
         </motion.div>
 
-        {/* 3D Fly-In Out-of-Screen Words with Typing Effect */}
-        <div className="pointer-events-auto">
-          <CinematicTitleTyping />
+        {/* 3D Perspective Letter-by-Letter Titles */}
+        <AnimatedText
+          text="CRAFTING DIGITAL"
+          className="font-display font-black text-5xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight text-white leading-none justify-center drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
+          delay={0.1}
+        />
+
+        <div className="overflow-visible mt-2">
+          <AnimatedText
+            text="EXPERIENCES"
+            className="font-display font-black text-5xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight gradient-text leading-none justify-center drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
+            delay={0.3}
+          />
         </div>
 
         {/* Dynamic Interactive Typewriter Engine */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.8 }}
+          transition={{ duration: 0.8, delay: 0.55 }}
           className="mt-6 pointer-events-auto"
         >
           <TypewriterRole />
@@ -68,7 +78,7 @@ const Hero = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 2.0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
           className="mt-5 text-sm sm:text-base md:text-lg text-white/60 max-w-xl font-light leading-relaxed pointer-events-auto"
         >
           Blending computational engineering with cinematic 3D motion to build bespoke,
@@ -79,7 +89,7 @@ const Hero = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 2.2 }}
+          transition={{ duration: 0.6, delay: 0.85 }}
           className="mt-8 flex items-center gap-4 flex-wrap justify-center pointer-events-auto"
         >
           <MagneticButton
